@@ -89,6 +89,27 @@ export const logout = (req, res) => {
     return res.sendStatus(200);
 };
 
-export const profile = (req, res) => {
-    res.send("Profile");
+export const profile = async (req, res) => {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', req.user.id)
+        .select()
+        .single();
+    
+    if (error) {
+        return res.status(400).json({ message: 'Error fetching user', error: error.message });
+    }
+    
+    if (!data) {
+        return res.status(400).json({ message: 'User not found' });
+    }
+
+    //console.log(req.user);
+    //res.send("Profile");
+    return res.json({
+        id: data.id,
+        username: data.username,
+        email: data.email
+    })
 };
